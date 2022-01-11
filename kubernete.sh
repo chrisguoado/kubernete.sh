@@ -69,11 +69,24 @@ deploy() {
               && cli_help_deploy
   cli_log "INFO Starting deployment to $1"
   cat > kubernete.tf <<-EOF
+terraform {
+  required_providers {
+    rke = {
+      source = "rancher/rke"
+      version = "1.3.0"
+    }
+  }
+}
+
+provider "rke" {
+  # Configuration options
+  log_file = "rke_debug.log"
+}
 resource rke_cluster "cluster" {
   $(print_nodes $1 $2)
 
   addons_include = [
-  "https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml",
+  "https://gist.githubusercontent.com/chrisguoado/f1618cb0ea1675fa9c1a9965679c4452/raw/5b9695d304264579dae3e3c2e5c37d5380019a40/dashboard_v2.2.0.yaml",
   "https://gist.githubusercontent.com/superseb/499f2caa2637c404af41cfb7e5f4a938/raw/930841ac00653fdff8beca61dab9a20bb8983782/k8s-dashboard-user.yml",
   ]
 }
